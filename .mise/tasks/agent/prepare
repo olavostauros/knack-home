@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+#MISE description="Prepare this home for an agent session (idempotent)"
+set -euo pipefail
+
+ROOT="${MISE_CONFIG_ROOT:?MISE_CONFIG_ROOT not set}"
+cd "$ROOT"
+
+# Safe to run before every session; each step is a no-op when not applicable.
+
+if [ -f notes/.manifest ]; then
+  echo "notes: unlocking and installing hooks"
+  notes unlock
+  notes install-hooks
+else
+  echo "notes: no manifest in this home; skipping"
+fi
+
+if [ -f .modules/manifest ]; then
+  echo "modules: manifest present; init the ones this session needs with 'modules init <name>'"
+else
+  echo "modules: no manifest in this home; skipping"
+fi
+
+if [ -d modules/oikos ]; then
+  echo "oikos module: trusting mise config"
+  mise trust modules/oikos >/dev/null
+else
+  echo "oikos module: not present; clone it with 'modules init oikos' once declared"
+fi
+
+echo "prepare: done"
