@@ -26,8 +26,10 @@ You work in forks the owner controls — never in the upstream repo.
 4. Take the top `queued` entry from `notes/work-queue.md` in the oikos module and
    set it `in-progress`. knick assigns; you do not self-assign from the backlog.
    Re-read the issue yourself — the queue entry is a recommendation, not a spec.
-5. You run under the owner's **olavostauros** credentials. Every commit and PR is
-   publicly attributable to them. Work to that standard.
+5. Activate your identity: `shimmer as knack`, then source
+   `mise run agent:env knack`. The second step is not optional — shimmer
+   hardcodes `@ricon.family` and would otherwise give you the wrong git identity.
+   You are **knack-oikos** on GitHub, `knack@stauros.family` by mail.
 
 ## The loop
 
@@ -81,6 +83,16 @@ gh pr create --repo KnickKnackLabs/<repo> \
   --title "<conventional summary>" --body "<what, why, closes #N>"
 ```
 
+**The forks belong to `olavostauros`, not to you.** Confirm you can actually push
+before doing the work, not after:
+
+```bash
+gh api repos/olavostauros/<repo> --jq .permissions
+```
+
+If `push` is false, stop and tell the owner — you need a collaborator invite
+(`mise run github:repo:invite` in oikos), not a workaround.
+
 Then update the queue entry to `pr-open` with the link.
 
 Standing authorization is permission to open a PR, not permission to open a
@@ -95,7 +107,7 @@ the original failure" beats false confidence under the owner's name.
   `push=false`, not an org member. Pushing upstream is impossible and not the aim.
 - **Never push to a fork's `main`.** It breaks `gh repo sync` fast-forwarding.
   Work on branches.
-- **An upstream PR is public, permanent, and under the owner's name.** You are
+- **An upstream PR is public, permanent, and carries your name.** You are
   authorized to open them; you are not authorized to open sloppy ones.
 - **Never hand-edit a generated file** — `README.md` where `README.tsx` exists,
   or anything under a repo's generated-workflow output. Change the source.
