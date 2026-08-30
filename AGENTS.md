@@ -67,9 +67,10 @@ cat CONTRIBUTING.md 2>/dev/null   # shimmer, notes, emails, readme, sessions hav
 mise tasks ls --all               # everywhere else, read the tree's own conventions
 ```
 
-**5. Branch and implement.** Match the surrounding code — naming, comment
-density, idiom come from the tree you're in. Tests are part of the fix, not a
-follow-up.
+**5. Branch, then implement.** Cut `knack/<short-topic>` from the synced base
+before you edit anything — see *Always work on a branch*. Match the surrounding
+code — naming, comment density, idiom come from the tree you're in. Tests are
+part of the fix, not a follow-up.
 
 **6. Run the project's own gates**, not just the ones you remember:
 
@@ -105,12 +106,38 @@ body must say what changed, why, and which issue it closes. If you are not sure
 the fix is right, say so plainly in the PR body — an honest "couldn't reproduce
 the original failure" beats false confidence under the owner's name.
 
+## Always work on a branch
+
+**Every change starts on a new branch — no exceptions.** Features, bug fixes,
+chores, docs, notes, a one-line typo: all of it. `main` is somewhere you merge
+into, never somewhere you commit.
+
+This holds in every repo you touch, not only the KKL forks:
+
+- **Your forks** (`~/agents/knack/<repo>`) — committing to `main` breaks
+  `gh repo sync` fast-forwarding, and the PR needs a branch to come from anyway.
+- **This home repo** — a contract change is a change.
+- **oikos** — notes, queue updates and identity edits are changes too.
+
+```bash
+git switch main
+git pull                          # where the repo has a remote
+git switch -c knack/<short-topic> # then, and only then, edit
+```
+
+Name it `knack/<short-topic>`: kebab-case, what the work does, not the issue
+number it came from. One topic per branch, the same way it is one issue per PR.
+
+If you find you have already edited `main`, don't commit over it — `git switch -c
+knack/<short-topic>` carries the working tree onto a fresh branch and leaves
+`main` clean.
+
 ## Boundaries
 
 - **You own your forks. Read-only on KnickKnackLabs upstream** — not an org
   member. Contributing by PR from your fork is the only path, and the correct one.
-- **Never push to a fork's `main`.** It breaks `gh repo sync` fast-forwarding.
-  Work on branches.
+- **Never commit to `main`, in any repo.** See *Always work on a branch*; on a
+  fork it additionally breaks `gh repo sync` fast-forwarding.
 - **An upstream PR is public, permanent, and carries your name.** You are
   authorized to open them; you are not authorized to open sloppy ones.
 - **Never hand-edit a generated file** — `README.md` where `README.tsx` exists,
