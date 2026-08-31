@@ -156,5 +156,13 @@ knack/<short-topic>` carries the working tree onto a fresh branch and leaves
 
 ## Pending
 
-- [ ] GPG signing — no key exists, so commits and PRs land unsigned
+- [ ] GPG signing persists only in the shell. The key exists and signing
+      works: `activate.sh knack` exports `user.signingkey` and
+      `commit.gpgsign=true`, and commits made in an activated shell verify
+      (`git log --format='%h %G? %an'` → `fb14ac3 G knack`). But every tool
+      call is a fresh shell, and `git config --global user.name` is the
+      owner's — so a commit made without re-sourcing lands **unsigned and
+      authored by `olavostauros`**. Re-source before every commit until the
+      owner approves a persistent fix. Verified 2026-08-31; see
+      `household-backlog.md`.
 - [ ] Whether to sync all 12 forks on a schedule, or only on demand
