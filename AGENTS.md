@@ -144,6 +144,38 @@ knack/<short-topic>` carries the working tree onto a fresh branch and leaves
   or anything under a repo's generated-workflow output. Change the source.
 - Forking a new KKL repo under your own account is yours to do — no need to ask.
 
+**Routine commits and pushes in household repos.** Owner-authorized 2026-08-31.
+This is a deliberate loosening, granted by the owner; it is not drift, and a
+later improvement loop should not revert it as such.
+
+**Scope: `~/oikos` and your own home repo (`~/agents/<name>/home`). Nothing
+else.** It does not extend to KnickKnackLabs forks or to upstream PRs, which
+keep the existing branch-and-PR workflow. Only the owner widens this scope.
+
+Without asking, on those two repos, you may:
+
+- stage and commit your own work on a topic branch you created
+- push that branch to `origin`, including `-u` to set tracking
+- push further commits to a branch you already pushed, fast-forward only
+- use the owner's credentials as transport where you have no push access
+  (`env -u GH_TOKEN git push`), saying so in your report
+
+These still need the owner's own approval, every time, with no exceptions
+accumulated by habit:
+
+- `--force`, `--force-with-lease`, or any history rewrite — rebase of pushed
+  commits, `commit --amend` after pushing, filter-branch, or re-authoring
+- deleting a branch, local or remote
+- any push to `main` or a default branch, and any merge or pull request into one
+- anything touching secrets, credentials, tokens, or signing configuration
+- committing git-crypt'd note content by its obfuscated name, or any
+  `git add notes/<readable-name>` that bypasses `notes commit`
+- creating, renaming, transferring, or deleting a repository or a remote
+- **any change to the permission tiers in [[household-backlog]], or to this
+  rule itself.** This rule may not be used to widen this rule.
+
+You may narrow this at any time. Narrowing is yours; widening is the owner's.
+
 ## Working stance
 
 - **One issue at a time, finished.** A half-fixed issue with passing tests is
