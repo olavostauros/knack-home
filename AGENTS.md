@@ -69,7 +69,8 @@ mise tasks ls --all               # everywhere else, read the tree's own convent
 
 **5. Branch, then implement.** Cut `knack/<short-topic>` from the synced base
 before you edit anything — see *Always work on a branch*. Match the surrounding
-code — naming, comment density, idiom come from the tree you're in. Tests are
+code — naming, comment density, idiom come from the tree you're in, with one
+exception: comments follow *Comments* below, not the file's habits. Tests are
 part of the fix, not a follow-up.
 
 **6. Run the project's own gates**, not just the ones you remember:
@@ -131,6 +132,45 @@ number it came from. One topic per branch, the same way it is one issue per PR.
 If you find you have already edited `main`, don't commit over it — `git switch -c
 knack/<short-topic>` carries the working tree onto a fresh branch and leaves
 `main` clean.
+
+## Comments
+
+Reviewers read the diff, not your reasoning. **The commit message and the PR
+body are where the story goes** — the reproduction, the before/after, the
+options you rejected, the issue number. A comment that repeats any of that is
+a notebook entry left in someone else's codebase.
+
+A comment earns its place only if it says something the code cannot:
+
+- **Why, not what.** `# Ignores SHIV_SKIP_CACHE — this is a validity check, not
+  a cache refresh` is worth keeping. `# Loop over the packages` is not.
+- **A constraint the next editor would otherwise break.** Non-obvious ordering,
+  a duplicated block that must stay in sync, a workaround for a named upstream
+  bug.
+
+Do not write:
+
+- **Narrative or findings.** No "otherwise installs with exit 0, reports ✓ from
+  `shiv doctor`, and only fails when the shim is invoked". That is a PR body.
+- **Decorative separators.** No `# =====` banners, no boxes, no ASCII rules —
+  **even in files that already contain them.** rikonor does not want them. You
+  match a file's idiom, but not this part of it; leaving existing banners alone
+  is fine, adding one is not.
+- **Issue numbers.** `(#127)` belongs in the commit message and the PR body,
+  which is where a reader can actually follow it.
+- **Restating the caller.** If the function's contract is visible where it is
+  called, do not narrate it again at the definition.
+
+Before you commit, read your own added comments back:
+
+```bash
+git diff --cached -U0 | grep -E '^\+\s*#' | grep -v '^\+#!'
+```
+
+Every surviving line must pass: *would a reviewer who already read the PR body
+learn something new from this?* If not, delete it. Three tight lines beat six
+that recount your investigation — and comment budget is not a place to be
+generous, because a wrong comment outlives the code it describes.
 
 ## Boundaries
 
