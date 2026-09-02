@@ -135,20 +135,22 @@ knack/<short-topic>` carries the working tree onto a fresh branch and leaves
 
 ## Comments
 
+**The ideal number of comments in a diff is zero.** Not "few" — zero. That is
+the number you should expect to hit on an ordinary change, and hitting it is the
+normal outcome, not an achievement. A comment is a rare exception you have to
+justify, never an allowance you are entitled to spend.
+
 Reviewers read the diff, not your reasoning. **The commit message and the PR
 body are where the story goes** — the reproduction, the before/after, the
-options you rejected, the issue number. A comment that repeats any of that is
-a notebook entry left in someone else's codebase.
+options you rejected, the issue number. A comment that repeats any of that is a
+notebook entry left in someone else's codebase.
 
-A comment earns its place only if it says something the code cannot:
+Most comments are a symptom. If the code needs prose to be followed, the fix is
+almost always a better name, a smaller function, or an earlier return — change
+the code and the comment stops being necessary. Reach for that first, every
+time.
 
-- **Why, not what.** `# Ignores SHIV_SKIP_CACHE — this is a validity check, not
-  a cache refresh` is worth keeping. `# Loop over the packages` is not.
-- **A constraint the next editor would otherwise break.** Non-obvious ordering,
-  a duplicated block that must stay in sync, a workaround for a named upstream
-  bug.
-
-Do not write:
+Never write:
 
 - **Narrative or findings.** No "otherwise installs with exit 0, reports ✓ from
   `shiv doctor`, and only fails when the shim is invoked". That is a PR body.
@@ -160,17 +162,29 @@ Do not write:
   which is where a reader can actually follow it.
 - **Restating the caller.** If the function's contract is visible where it is
   called, do not narrate it again at the definition.
+- **What the code already says.** `# Loop over the packages` above a loop.
 
-Before you commit, read your own added comments back:
+The exception is narrow. A comment may survive only when it records something
+the code **cannot** express and the next editor would otherwise break:
+
+- a constraint with no syntax — non-obvious ordering, two blocks that must stay
+  in sync, a workaround for a named upstream bug
+- a *why* that is invisible locally, like `# Ignores SHIV_SKIP_CACHE — this is a
+  validity check, not a cache refresh`
+
+Both are rare. Neither is a licence to explain your change.
+
+Before you commit, read back every comment you added:
 
 ```bash
-git diff --cached -U0 | grep -E '^\+\s*#' | grep -v '^\+#!'
+git diff --cached -U0 | grep -nE '^\+[[:space:]]*(#|//|--|/\*|\*)' | grep -v '#!'
 ```
 
-Every surviving line must pass: *would a reviewer who already read the PR body
-learn something new from this?* If not, delete it. Three tight lines beat six
-that recount your investigation — and comment budget is not a place to be
-generous, because a wrong comment outlives the code it describes.
+The default for each line is **delete**. It survives only if you can say, in one
+sentence, what a competent reader loses when it is gone — and "context" is not an
+answer. If the honest answer is that the code could carry it instead, change the
+code. A comment that merely fails to be wrong has not earned anything; a wrong
+one outlives the code it describes.
 
 ## Boundaries
 
