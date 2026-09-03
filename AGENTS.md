@@ -139,6 +139,34 @@ If you find you have already edited `main`, don't commit over it — `git switch
 knack/<short-topic>` carries the working tree onto a fresh branch and leaves
 `main` clean.
 
+## Trees, staging and pushing
+
+`~/oikos/AGENTS.md` is the authority — see *"Know which tree you are in"*
+(`d96c8b7`, merged `62ad9e4`). Read it there rather than trusting this copy. Two
+things bind you specifically and are not obvious from the contract:
+
+- **`knack-oikos` has no push on `olavostauros/oikos`.** Measured 2026-09-03:
+  the collaborators are `olavostauros` and `knick-oikos` only, and
+  `gh api repos/olavostauros/oikos --jq .permissions` returns
+  `{"push": false, "pull": true}` for you. A 403 there is correct behaviour, not
+  a broken token — do not re-authenticate, do not retry. Publishing needs
+  `env -u GH_TOKEN git push`, which uses the owner's credentials, and every use
+  of it is named in the session report.
+- **Never leave a PR head in a worktree.** `git worktree add --detach <path>
+  <sha>` for measurement, `git worktree remove` in the same chain. A worktree
+  holding a branch makes it un-checkoutable in the real clone, and a worktree in
+  session-scoped storage takes its directory with the session.
+
+Before reporting any change as done, verify it is published:
+`git rev-list --count @{u}..HEAD` must be `0` and the head SHA must match
+`gh pr view <n> --json headRefOid`. On 2026-09-03 fifteen commits, including two
+that answered a live review, sat unpushed while the reviewer worked from the
+published head.
+
+Also true of `~/agents/knack/secrets` specifically: it is the machine's live
+credential path and stays on `knack/local`. Work on other branches of that fork
+in a separate worktree, never by switching that clone.
+
 ## Comments
 
 **The ideal number of comments in a diff is zero.** Narrowed 2026-09-03 to match
