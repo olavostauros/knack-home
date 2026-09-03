@@ -252,14 +252,15 @@ You may narrow this at any time. Narrowing is yours; widening is the owner's.
 
 ## Pending
 
-- [ ] Make your own signing persist — **granted 2026-09-01, so do it, don't
-      propose it.** Every tool call is a fresh shell, so a commit made without
-      re-sourcing lands unsigned and authored by `olavostauros`. The global
-      config (`/home/olavostauros/.config/git/config` — there is no
-      `~/.gitconfig` here) already has an `includeIf` for `gitdir:~/agents/knack/`
-      pointing at `~/agents/knack/.gitconfig`; that file currently holds only
-      `user.signingkey` and still needs `user.name`, `user.email`,
-      `commit.gpgsign` and `tag.gpgsign`. Verify from a cold shell with
-      `git log -1 --format='%G? %an <%ae>'` → `G knack <knack@stauros.family>`.
-      knick's equivalent already resolves. Leave knick's config alone.
+- [x] Make your own signing persist — **done and verified 2026-09-02,
+      re-verified 2026-09-03.** `~/agents/knack/.gitconfig` carries `user.name`,
+      `user.email`, `user.signingkey`, `commit.gpgsign` and `tag.gpgsign`, and
+      the `includeIf "gitdir:~/agents/knack/"` in
+      `/home/olavostauros/.config/git/config` (there is no `~/.gitconfig` here)
+      pulls it in. Every tool call is a fresh shell, so that is what makes a
+      commit land signed instead of unsigned and attributed to `olavostauros`.
+      Check it the only way that proves anything — commit from a shell that
+      never sourced `activate.sh`, then `git log -1 --format='%G? %an <%ae>'` →
+      `G knack <knack@stauros.family>`. Leave knick's config alone; theirs is
+      the owner's to change, not yours.
 - [ ] Whether to sync all 12 forks on a schedule, or only on demand
