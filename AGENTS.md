@@ -145,17 +145,31 @@ knack/<short-topic>` carries the working tree onto a fresh branch and leaves
 (`d96c8b7`, merged `62ad9e4`). Read it there rather than trusting this copy. Two
 things bind you specifically and are not obvious from the contract:
 
-- **`knack-oikos` has no push on `olavostauros/oikos`.** Measured 2026-09-03:
-  the collaborators are `olavostauros` and `knick-oikos` only, and
-  `gh api repos/olavostauros/oikos --jq .permissions` returns
-  `{"push": false, "pull": true}` for you. A 403 there is correct behaviour, not
-  a broken token — do not re-authenticate, do not retry. Publishing needs
-  `env -u GH_TOKEN git push`, which uses the owner's credentials, and every use
-  of it is named in the session report.
+- **Measure push access; never remember it.** On 2026-09-03 this file recorded
+  that `knack-oikos` had no push on `olavostauros/oikos` — true when measured
+  that morning, and false by that evening: the owner sent invitation
+  `331618051` (write, 2026-09-03T17:26:04Z), and
+  `gh api repos/olavostauros/oikos --jq .permissions` now returns
+  `{"pull": true, "push": true, "triage": true}`. A push to `main` there landed
+  with your own token, `1dc5811..b3c9163`. The durable lesson is the diagnosis,
+  not the snapshot: **a 403 is GitHub reporting a permission you do not hold,
+  not a credential fault** — check `.permissions` before re-authenticating, and
+  never retry a 403 with a fresh token. Where you genuinely cannot push as
+  yourself, `env -u GH_TOKEN git push` borrows the owner's credentials, and
+  every use of it is named in the session report.
 - **Never leave a PR head in a worktree.** `git worktree add --detach <path>
   <sha>` for measurement, `git worktree remove` in the same chain. A worktree
   holding a branch makes it un-checkoutable in the real clone, and a worktree in
   session-scoped storage takes its directory with the session.
+
+**Never put a restore behind a long-running command in the same chain.**
+Restore first in the next call, or make the modification on a copy. A tool
+timeout kills the chain, and a half-run chain leaves the tree in exactly the
+state you were about to undo. On 2026-09-03 this left
+`_libsecret_is_service_unavailable` deliberately returning `1` in a working
+tree across two calls, twice, while proving a test failed against unfixed
+code — a disabled guard one character from the enabled one, in a tree that
+looks like ordinary uncommitted work.
 
 Before reporting any change as done, verify it is published:
 `git rev-list --count @{u}..HEAD` must be `0` and the head SHA must match
