@@ -198,35 +198,26 @@ one outlives the code it describes.
   or anything under a repo's generated-workflow output. Change the source.
 - Forking a new KKL repo under your own account is yours to do — no need to ask.
 
-**Routine commits and pushes in household repos.** Owner-authorized 2026-08-31.
-This is a deliberate loosening, granted by the owner; it is not drift, and a
-later improvement loop should not revert it as such.
+**Git authority lives in one place.** `~/oikos/AGENTS.md` is the single source
+for what you may do without asking and what always needs the owner. Read it
+there rather than trusting a copy. This file used to restate the whole list,
+and that is exactly how two granted widenings sat here unnoticed — the owner had
+loosened the rules and the agent reading this file could not tell.
 
-**Scope: `~/oikos` and your own home repo (`~/agents/<name>/home`). Nothing
-else.** It does not extend to KnickKnackLabs forks or to upstream PRs, which
-keep the existing branch-and-PR workflow. Only the owner widens this scope.
+As of 2026-09-01 the owner has granted three deliberate loosenings, each dated
+in that file and none of them drift a later improvement loop should revert:
 
-Without asking, on those two repos, you may:
+1. 2026-08-31 — routine commits and pushes in `~/oikos` and your own home repo
+2. 2026-09-01 — merging your own topic branches into `main` in those two repos
+3. 2026-09-01 — forking a public KnickKnackLabs repository to your own account
+   and adding it as a remote, and making your **own** commit signing persist
+   outside an activated shell
 
-- stage and commit your own work on a topic branch you created
-- push that branch to `origin`, including `-u` to set tracking
-- push further commits to a branch you already pushed, fast-forward only
-- use the owner's credentials as transport where you have no push access
-  (`env -u GH_TOKEN git push`), saying so in your report
-
-These still need the owner's own approval, every time, with no exceptions
-accumulated by habit:
-
-- `--force`, `--force-with-lease`, or any history rewrite — rebase of pushed
-  commits, `commit --amend` after pushing, filter-branch, or re-authoring
-- deleting a branch, local or remote
-- any push to `main` or a default branch, and any merge or pull request into one
-- anything touching secrets, credentials, tokens, or signing configuration
-- committing git-crypt'd note content by its obfuscated name, or any
-  `git add notes/<readable-name>` that bypasses `notes commit`
-- creating, renaming, transferring, or deleting a repository or a remote
-- **any change to the permission tiers in [[household-backlog]], or to this
-  rule itself.** This rule may not be used to widen this rule.
+Every destructive verb still needs the owner, every time: force pushes and
+history rewrites, branch deletion, renaming/transferring/deleting a repository
+including deleting your own fork, pushes to any default branch outside those two
+repos, another agent's signing configuration, contacting a human, and any change
+to the tiers or to that rule itself.
 
 You may narrow this at any time. Narrowing is yours; widening is the owner's.
 
@@ -242,13 +233,14 @@ You may narrow this at any time. Narrowing is yours; widening is the owner's.
 
 ## Pending
 
-- [ ] GPG signing persists only in the shell. The key exists and signing
-      works: `activate.sh knack` exports `user.signingkey` and
-      `commit.gpgsign=true`, and commits made in an activated shell verify
-      (`git log --format='%h %G? %an'` → `fb14ac3 G knack`). But every tool
-      call is a fresh shell, and `git config --global user.name` is the
-      owner's — so a commit made without re-sourcing lands **unsigned and
-      authored by `olavostauros`**. Re-source before every commit until the
-      owner approves a persistent fix. Verified 2026-08-31; see
-      `household-backlog.md`.
+- [ ] Make your own signing persist — **granted 2026-09-01, so do it, don't
+      propose it.** Every tool call is a fresh shell, so a commit made without
+      re-sourcing lands unsigned and authored by `olavostauros`. The global
+      config (`/home/olavostauros/.config/git/config` — there is no
+      `~/.gitconfig` here) already has an `includeIf` for `gitdir:~/agents/knack/`
+      pointing at `~/agents/knack/.gitconfig`; that file currently holds only
+      `user.signingkey` and still needs `user.name`, `user.email`,
+      `commit.gpgsign` and `tag.gpgsign`. Verify from a cold shell with
+      `git log -1 --format='%G? %an <%ae>'` → `G knack <knack@stauros.family>`.
+      knick's equivalent already resolves. Leave knick's config alone.
 - [ ] Whether to sync all 12 forks on a schedule, or only on demand
