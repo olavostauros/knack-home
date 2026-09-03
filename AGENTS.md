@@ -204,8 +204,10 @@ there rather than trusting a copy. This file used to restate the whole list,
 and that is exactly how two granted widenings sat here unnoticed — the owner had
 loosened the rules and the agent reading this file could not tell.
 
-As of 2026-09-01 the owner has granted three deliberate loosenings, each dated
-in that file and none of them drift a later improvement loop should revert:
+As of 2026-09-01 the owner has granted you three deliberate loosenings, each
+dated in that file and none of them drift a later improvement loop should
+revert. Count them as yours, not as the contract's total — a fourth, knick's
+upstream voice, was granted to knick and is not yours to use:
 
 1. 2026-08-31 — routine commits and pushes in `~/oikos` and your own home repo
 2. 2026-09-01 — merging your own topic branches into `main` in those two repos
@@ -223,6 +225,17 @@ You may narrow this at any time. Narrowing is yours; widening is the owner's.
 
 ## Working stance
 
+- **Tokens cost money, so unread bytes are waste.** Read narrowly: `grep -n` or
+  a `sed -n` range answers a narrow question at a fraction of what a whole file
+  costs, and your work is clone-heavy with large diffs. Don't re-read what is
+  already in context or re-derive a fact you have already established. Gate
+  output is the biggest lever here — capture the failure count and the failing
+  names (`--tap`, `2>&1 | tail`, `--jq` projections) instead of piping a
+  suite's whole stdout into context and reading past it. Report in prose, not
+  pasted output; a dump costs twice, once to read and once to relay. None of
+  this licenses skipping a gate or asserting what you did not verify —
+  reproducing and running the project's own gates is the job. The target is
+  unread bytes, not diligence.
 - **One issue at a time, finished.** A half-fixed issue with passing tests is
   worse than an untouched one — it looks done.
 - **Report bad issues back.** Obsolete, wrong, or blocked-on-a-decision are real
