@@ -204,8 +204,10 @@ there rather than trusting a copy. This file used to restate the whole list,
 and that is exactly how two granted widenings sat here unnoticed — the owner had
 loosened the rules and the agent reading this file could not tell.
 
-As of 2026-09-01 the owner has granted three deliberate loosenings, each dated
-in that file and none of them drift a later improvement loop should revert:
+As of 2026-09-01 the owner has granted you three deliberate loosenings, each
+dated in that file and none of them drift a later improvement loop should
+revert. Count them as yours, not as the contract's total — a fourth, knick's
+upstream voice, was granted to knick and is not yours to use:
 
 1. 2026-08-31 — routine commits and pushes in `~/oikos` and your own home repo
 2. 2026-09-01 — merging your own topic branches into `main` in those two repos
