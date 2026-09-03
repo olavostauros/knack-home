@@ -141,44 +141,60 @@ knack/<short-topic>` carries the working tree onto a fresh branch and leaves
 
 ## Comments
 
-**The ideal number of comments in a diff is zero.** Not "few" — zero. That is
-the number you should expect to hit on an ordinary change, and hitting it is the
-normal outcome, not an achievement. A comment is a rare exception you have to
-justify, never an allowance you are entitled to spend.
+**The ideal number of comments in a diff is zero.** Narrowed 2026-09-03 to match
+`~/oikos/AGENTS.md` (`13048b1`, merged `55610f5`), which is the authority; this
+is the long form, not a second source. A comment is not the default state of a
+line. The reader already has the code, the commit message and the PR body, and a
+comment has to beat all three. Try to make it unnecessary first — a better name,
+a smaller function, an earlier guard, clearer control flow — and only when that
+genuinely fails should a comment survive.
+
+**The ideal is a target, not a prohibition, and the test is mechanical.** Delete
+the comment, then ask whether a competent editor could now reintroduce a defect
+it was preventing. If yes it stays: it carries a constraint the code cannot
+express. If the answer is "the code already says this", it goes. Zero is what
+you aim at, never a count you hit by deleting something holding a bug down.
 
 Reviewers read the diff, not your reasoning. **The commit message and the PR
 body are where the story goes** — the reproduction, the before/after, the
 options you rejected, the issue number. A comment that repeats any of that is a
 notebook entry left in someone else's codebase.
 
-Most comments are a symptom. If the code needs prose to be followed, the fix is
-almost always a better name, a smaller function, or an earlier return — change
-the code and the comment stops being necessary. Reach for that first, every
-time.
+Worked example, so the line is not theoretical: the note in `lib/1password.sh`
+recording that a broadened match silently produces duplicate items **stays**,
+because deleting it invites the next editor to broaden the match again. Your own
+`3c1f939` compressing it rather than removing it is the behaviour this rule
+wants, and the house contract names it as such.
 
-Never write:
+What does not survive:
 
-- **Narrative or findings.** No "otherwise installs with exit 0, reports ✓ from
-  `shiv doctor`, and only fails when the shim is invoked". That is a PR body.
+- **Restatement.** `# Read the existing value` above a line that reads the
+  existing value.
+- **Narration of structure.** `# Write under the new name`, `# Delete the old
+  entry` — a reader who can see three calls does not need them named.
+- **Docblock ceremony that repeats the signature.** A `# Usage:` line restating
+  parameters the function already declares.
+- **History and provenance.** Reproductions, before/after, issue numbers,
+  what the code used to do. `(#127)` belongs in the commit message and the PR
+  body, where a reader can follow it.
 - **Decorative separators.** No `# =====` banners, no boxes, no ASCII rules —
-  **even in files that already contain them.** rikonor does not want them. You
-  match a file's idiom, but not this part of it; leaving existing banners alone
-  is fine, adding one is not.
-- **Issue numbers.** `(#127)` belongs in the commit message and the PR body,
-  which is where a reader can actually follow it.
-- **Restating the caller.** If the function's contract is visible where it is
-  called, do not narrate it again at the definition.
-- **What the code already says.** `# Loop over the packages` above a loop.
+  **even in files that already contain them.** rikonor does not want them.
+  Leaving existing banners alone is fine; adding one is not.
 
-The exception is narrow. A comment may survive only when it records something
-the code **cannot** express and the next editor would otherwise break:
+**This binds our repos. Upstream keeps its own house style.** `~/oikos` and this
+home are ours and the ideal applies straight. A pull request into someone else's
+project is a different act: match the file you are changing, the same deference
+the separator rule already encodes.
 
-- a constraint with no syntax — non-obvious ordering, two blocks that must stay
-  in sync, a workaround for a named upstream bug
-- a *why* that is invisible locally, like `# Ignores SHIV_SKIP_CACHE — this is a
-  validity check, not a cache refresh`
-
-Both are rare. Neither is a licence to explain your change.
+**Where a new file is deliberately built to mirror an existing one, parity
+wins.** Measured 2026-09-03 on `KnickKnackLabs/secrets`: `lib/keychain.sh` is 43
+comment lines of 176 (24%), and `lib/libsecret.sh`, written to mirror it
+function for function, is 55 of 206 (26%) — with several comments verbatim
+identical to the sibling's. Stripping those would not apply our style to a
+neutral file; it would make the new provider the only one in `lib/` without the
+conventions every other one has, and break the parity the change is built on.
+When our ideal and an upstream file's own convention genuinely conflict, say so
+to the owner and let the maintainer's codebase win.
 
 Before you commit, read back every comment you added:
 
@@ -186,11 +202,9 @@ Before you commit, read back every comment you added:
 git diff --cached -U0 | grep -nE '^\+[[:space:]]*(#|//|--|/\*|\*)' | grep -v '#!'
 ```
 
-The default for each line is **delete**. It survives only if you can say, in one
-sentence, what a competent reader loses when it is gone — and "context" is not an
-answer. If the honest answer is that the code could carry it instead, change the
-code. A comment that merely fails to be wrong has not earned anything; a wrong
-one outlives the code it describes.
+Run each surviving line through the deletion test above. "Context" is not an
+answer; a defect the next editor could reintroduce is. If the honest answer is
+that the code could carry it instead, change the code.
 
 ## Boundaries
 
