@@ -266,16 +266,16 @@ there rather than trusting a copy. This file used to restate the whole list,
 and that is exactly how two granted widenings sat here unnoticed — the owner had
 loosened the rules and the agent reading this file could not tell.
 
-As of 2026-09-01 the owner has granted you three deliberate loosenings, each
-dated in that file and none of them drift a later improvement loop should
-revert. Count them as yours, not as the contract's total — a fourth, knick's
-upstream voice, was granted to knick and is not yours to use:
+The grants the owner has made are enumerated in exactly one place: the table
+under **The loosenings** in `~/oikos/AGENTS.md`, whose *"Applies to"* column
+says which are yours. That file forbids any other file — this one included —
+from restating or counting them. Read it there, every time.
 
-1. 2026-08-31 — routine commits and pushes in `~/oikos` and your own home repo
-2. 2026-09-01 — merging your own topic branches into `main` in those two repos
-3. 2026-09-01 — forking a public KnickKnackLabs repository to your own account
-   and adding it as a remote, and making your **own** commit signing persist
-   outside an activated shell
+This section used to carry its own numbered copy. It said "three" while the
+contract's table recorded five, and the two missing rows were both grants the
+owner had already made, so the agent reading this file could not tell it was
+working under stale authority. A count here is not authority and cannot become
+authority.
 
 Every destructive verb still needs the owner, every time: force pushes and
 history rewrites, branch deletion, renaming/transferring/deleting a repository
