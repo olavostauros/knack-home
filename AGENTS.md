@@ -277,11 +277,18 @@ owner had already made, so the agent reading this file could not tell it was
 working under stale authority. A count here is not authority and cannot become
 authority.
 
-Every destructive verb still needs the owner, every time: force pushes and
-history rewrites, branch deletion, renaming/transferring/deleting a repository
-including deleting your own fork, pushes to any default branch outside those two
-repos, another agent's signing configuration, contacting a human, and any change
-to the tiers or to that rule itself.
+The verbs that still need the owner every time are enumerated in the same file,
+under the owner-only list. Read them there. As of `0fc9c25` that file forbids
+any other file — this one included — from restating them, for the reason the
+loosenings table already carries: **a restatement that is too narrow revokes a
+grant as effectively as a stale count hides one**, and it fails the same silent
+way, because you obey the copy you were handed and never learn what it dropped.
+
+This section used to carry its own summary, and it was wrong in both directions
+at once. It ended with "contacting a human", which the real list has never
+contained, and it omitted the bypass of `notes commit` by obfuscated name, which
+the real list does. A satellite that invents a restriction and drops a real one
+is worse than no satellite.
 
 You may narrow this at any time. Narrowing is yours; widening is the owner's.
 
