@@ -2,40 +2,35 @@
 
 Living state. Updated as work happens, not at the end.
 
-## Current work — KnickKnackLabs/sessions#116
+## Last finished — KnickKnackLabs/sessions#116
 
 `sessions list --all` was capped at 20, so a corpus count silently returned 20.
-Assigned by knick in [[work-queue]] on `knick/queue-sessions-116` (`5684522`).
+Assigned by knick in [[work-queue]]; shipped as
+https://github.com/KnickKnackLabs/sessions/pull/146 on 2026-09-09.
 
-**Status: fix complete and green, BLOCKED before the PR. Needs the owner.**
+- Branch `knack/list-all-lifts-limit` on `knack-oikos/sessions`, commit
+  `7ac3f9b`, signed, cut fresh from `upstream/main` (`b4d1e83`) — a sibling of
+  #138, not a chain. Pushed, `headRefOid` verified against the local head.
+- Reproduced on 25 fixture sessions (`--all --json` gave 20 of 25). The new case
+  `list --all lifts the default limit` was proven to fail against unfixed code
+  first (`expected all 24 sessions, got 20`) before the fix was written.
+- Gates: `list.bats` 28/28, `lint:python` clean, `codebase lint` 19/19,
+  `git diff --check` clean, README regenerated to 393/387. The 9
+  `test/ci-cache.bats` failures are pre-existing — see hazards below.
+- Queue entry is `pr-open` on `knack/queue-116-progress` in the shared checkout.
+  Nothing left to do here; upstream review is not ours to chase, and knack does
+  not nudge its own PRs.
 
-- Clone `~/agents/knack/sessions`, branch `knack/list-all-lifts-limit`,
-  commit `7ac3f9b` — signed, authored knack, cut fresh from `upstream/main`
-  (`b4d1e83`), a sibling of #138 and not a chain.
-- **`7ac3f9b` is held unpushed.** `git push` to `knack-oikos/sessions` was
-  rejected: the PAT carries `public_repo` only, and the branch republishes
-  `.github/workflows/test.yml` because the fork's default branch is 25 commits
-  behind the upstream base. Not a credential fault — `admin`/`push` on the fork
-  both measured true.
-- The two ways out (token scope, or advancing the fork's default branch) are
-  the owner's. Reported and waiting; do not route around either.
+### The push blocker, worth remembering
 
-### What is already proven
-
-- Reproduced on 25 fixture sessions: `--all --json` returned 20 of 25.
-- New case `list --all lifts the default limit` failed against unfixed code
-  first (`expected all 24 sessions, got 20`), with `.mise/tasks/list` confirmed
-  unmodified at that moment. After the fix, 25 of 25 and `list.bats` 28/28.
-- Gates: `lint:python` clean, `codebase lint` 19/19, `git diff --check` clean,
-  README regenerated to 393/387.
-
-### Next session, in order
-
-1. Ask the owner for the fork sync (narrower than widening token scope), then
-   push `7ac3f9b` and open the PR against `KnickKnackLabs/sessions`.
-2. PR body must mention `.mise/tasks/ps` as an observation only — same
-   asymmetry, deliberately out of scope, let the maintainer ask.
-3. Then set the queue entry to `pr-open` with the link.
+The first push was rejected for lacking `workflow` scope. Cause: the fork's
+default branch was 25 commits behind the upstream base, and those commits change
+`.github/workflows/test.yml`, so a correctly fresh-cut branch republishes that
+file. `admin`/`push` on the fork were both true — a token *scope* fact, not a
+credential fault, and not something to retry with a fresh token. Diagnose with
+`curl -sI -H "Authorization: token $GH_TOKEN" https://api.github.com/user | grep
+-i x-oauth-scopes` before touching anything. The owner widened the PAT; the fix
+was never mine to apply.
 
 ## Standing hazards worth remembering
 
