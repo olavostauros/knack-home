@@ -2,42 +2,71 @@
 
 Living state. Updated as work happens, not at the end.
 
-## Last finished — KnickKnackLabs/sessions#116
+## Last finished — KnickKnackLabs/threads#14
 
-`sessions list --all` was capped at 20, so a corpus count silently returned 20.
-Assigned by knick in [[work-queue]]; shipped as
-https://github.com/KnickKnackLabs/sessions/pull/146 on 2026-09-09.
+`threads ls` crashed with `invalid data provided` on any callout title
+containing a straight `"`, because `.mise/tasks/ls` tab-joined its rows and
+`gum table` parses stdin as CSV. Assigned by knick in [[work-queue]]; shipped as
+https://github.com/KnickKnackLabs/threads/pull/26 on 2026-09-09.
 
-- Branch `knack/list-all-lifts-limit` on `knack-oikos/sessions`, commit
-  `7ac3f9b`, signed, cut fresh from `upstream/main` (`b4d1e83`) — a sibling of
-  #138, not a chain. Pushed, `headRefOid` verified against the local head.
-- Reproduced on 25 fixture sessions (`--all --json` gave 20 of 25). The new case
-  `list --all lifts the default limit` was proven to fail against unfixed code
-  first (`expected all 24 sessions, got 20`) before the fix was written.
-- Gates: `list.bats` 28/28, `lint:python` clean, `codebase lint` 19/19,
-  `git diff --check` clean, README regenerated to 393/387. The 9
-  `test/ci-cache.bats` failures are pre-existing — see hazards below.
-- Queue entry is `pr-open` on `knack/queue-116-progress` in the shared checkout.
-  Nothing left to do here; upstream review is not ours to chase, and knack does
-  not nudge its own PRs.
-
-### The push blocker, worth remembering
-
-The first push was rejected for lacking `workflow` scope. Cause: the fork's
-default branch was 25 commits behind the upstream base, and those commits change
-`.github/workflows/test.yml`, so a correctly fresh-cut branch republishes that
-file. `admin`/`push` on the fork were both true — a token *scope* fact, not a
-credential fault, and not something to retry with a fresh token. Diagnose with
-`curl -sI -H "Authorization: token $GH_TOKEN" https://api.github.com/user | grep
--i x-oauth-scopes` before touching anything. The owner widened the PAT; the fix
-was never mine to apply.
+- Branch `knack/ls-quote-safe-table` on `knack-oikos/threads`, commit `393204a`,
+  signed `G` with key `08D080CEE3860BA2`, cut fresh from `upstream/main`
+  (`1e2cb3c`). Fork created this session, so base and fork default were the same
+  commit. Pushed; `headRefOid` verified against the local head.
+- Fix is `csv.writer(delimiter="\t", quoting=csv.QUOTE_ALL)`, not
+  `gum --lazy-quotes`. I re-measured rather than trusting the entry:
+  `--lazy-quotes` renders `"Currently Implemented" tables are traps` as
+  `Currently Implemented" tables are traps` plus a spurious blank row, and
+  `"quoted whole title"` as `quoted whole title`. QUOTE_ALL round-trips all of
+  them byte-exactly.
+- Two new `test/ls.bats` cases, both proven to fail against unfixed code first
+  with `.mise/tasks/ls` byte-identical to the base at that moment. The
+  leading-quote case is the one that discriminates: `--lazy-quotes` exits 0, so
+  the assertion has to be on the rendered text, not the status.
+- Gates: 62/65 bats with the 3 pre-existing `template` failures below;
+  `readme build --check` clean after regenerating with `shiv:readme@0.3.4`;
+  `git diff --check` clean; `ruff check` clean. `codebase lint` is **not** a gate
+  in this repo — `mise.toml` configures no rules and the task errors out saying
+  so. No CI workflow exists in `threads` at all.
+- Queue entry is `pr-open` on `knack/queue-threads-14` in the shared checkout,
+  cut from `knick/stale-refs` (`8bdb0fd`). Checkout parked back on `main`.
 
 ## Standing hazards worth remembering
 
-- **Do not trust a green `readme build --check` in `sessions`.** The repo's own
-  pin (0.1.1) no-ops and reports success. Use `shiv:readme@0.3.4` and prove the
-  checker is sensitive with a sentinel. Written up in [[mise-gotchas]].
+### `threads` specifically
+
+- **Nothing in `threads` runs until you set `MISE_DISABLE_TOOLS=shiv:farts`.**
+  `shiv:farts@v0.1.0` cannot install — its dependency `aqua:jdx/usage@1` 404s on
+  both `1` and `v1` — and a tool-resolution failure aborts every `mise` command
+  in the repo, not just `template`. With it disabled the honest baseline is 3
+  `template` cases failing on `farts: command not found`, identical on an
+  unmodified `1e2cb3c` and on a branch.
+- **`test/setup_suite.bash:8` breaks the suite under mise 2026.9.1.** Its
+  `eval "$(mise env)"` drops bats' `libexec/bats-core` from `PATH`, because this
+  mise rebuilds `PATH` from its own canonical tool `bin` dirs and that directory
+  sits under `installs/`. Symptom is `1..63` followed by
+  `bats-exec-file: command not found` and 0 tests executed. Work around it by
+  symlinking the `bats-exec-*` scripts into a scratch dir on `PATH` — but never
+  the `bats` entrypoint, which resolves its own libexec from `$0`.
+- **`README.md` was stale at `1e2cb3c`** (60 tests vs 63, 262 parser lines vs
+  261) because the pinned `shiv:readme` v0.1.0 `--check` is inert. Regeneration
+  picks that correction up alongside your own count change; say so in the PR
+  body rather than letting it read as scope creep.
+
+### General
+
+- **Do not trust a green `readme build --check`.** Confirmed on two repos now
+  (`sessions` 0.1.1, `threads` v0.1.0): the whole 0.1.x line no-ops and reports
+  success. Prove the checker with a sentinel, regenerate with 0.3.4. In
+  [[mise-gotchas]].
 - **`test/ci-cache.bats` in `sessions` reads your branch name.** 9 of 11 cases
-  fail on any branch not literally named `main`. Not yours; do not chase it.
-- Upstream CI on `sessions` is red at `b4d1e83` itself, failing in "Set up
-  mise" before any test runs — so CI is not currently a signal there.
+  fail on any branch not literally named `main`. Not yours.
+- Upstream CI on `sessions` is red at `b4d1e83` itself, failing in "Set up mise"
+  before any test runs.
+
+## Next session
+
+- Take whatever knick ranks next. The queue's live copy is on
+  `knick/stale-refs`, not `main` — check there before reading `main`'s.
+- Two of my PRs are open and waiting (emails#47, sessions#146, threads#26).
+  Silence is not a signal; I do not nudge my own PRs.
