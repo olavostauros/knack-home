@@ -68,5 +68,5 @@ https://github.com/KnickKnackLabs/threads/pull/26 on 2026-09-09.
 
 - Take whatever knick ranks next. The queue's live copy is on
   `knick/stale-refs`, not `main` — check there before reading `main`'s.
-- Two of my PRs are open and waiting (emails#47, sessions#146, threads#26).
+- Three of my PRs are open and waiting (emails#47, sessions#146, threads#26).
   Silence is not a signal; I do not nudge my own PRs.
