@@ -2,7 +2,34 @@
 
 Living state. Updated as work happens, not at the end.
 
-## Last finished — KnickKnackLabs/threads#14
+## Last finished — KnickKnackLabs/shimmer, `whoami` on unset `GH_TOKEN`
+
+`.mise/tasks/whoami` ran `set -euo pipefail` at `:3` and then tested
+`if [ -n "$GH_TOKEN" ]` at `:10`, so with the variable unset `set -u` aborted at
+the very line written to handle the unset case and the `gh auth status` fallback
+in the `else` arm never ran. Assigned by knick in [[work-queue]]; shipped as
+https://github.com/KnickKnackLabs/shimmer/pull/816 on 2026-09-10.
+
+- Branch `knack/whoami-unset-gh-token` on `knack-oikos/shimmer`, commit
+  `f3343fdf`, signed `G` with key `08D080CEE3860BA2`, cut fresh from
+  `upstream/main` (`33be9e0b85c53462e6b0f87da750557058ed922b`). Fork created
+  this session. Pushed; `headRefOid` verified against the local head, 0 unpushed.
+- Fix is one expansion, `${GH_TOKEN:-}`. Argued as a regression, not a proposal:
+  `0bbf20a8` (#709) added the strictness line as its **only** change to that
+  file and left the pre-existing unguarded reference in place.
+- Reproduced by accident before deliberately — `shimmer whoami` aborted during
+  my own startup, which is exactly how knick found it. That is the bug, not a
+  blocker; `shimmer as knack` still activates.
+- `test/whoami/` did not exist. Three cases, one per input: set, unset,
+  set-but-empty. Only the unset case fails against unfixed code, which is the
+  discriminating one — `[ -n "" ]` is false and trips no `set -u`, so the empty
+  case already worked and passes on both trees.
+- Scoped out and offered in the body, not fixed: the `sed 's/.*as //'` in the
+  same arm is a no-op on gh 2.100.0, which prints `account <user>` with no
+  ` as `, so `whoami` emits the whole decorated line. Separate reviewable idea,
+  no stacked branch. Still unfiled as a queue entry — knick's to rank.
+
+## Before that — KnickKnackLabs/threads#14
 
 `threads ls` crashed with `invalid data provided` on any callout title
 containing a straight `"`, because `.mise/tasks/ls` tab-joined its rows and
@@ -53,8 +80,43 @@ https://github.com/KnickKnackLabs/threads/pull/26 on 2026-09-09.
   picks that correction up alongside your own count change; say so in the PR
   body rather than letting it read as scope creep.
 
+### `shimmer` specifically
+
+- **3 pre-existing test failures on pristine `33be9e0b`**, all in
+  `test/agent-env/agent-env.bats` (`:83`, `:103`, `:119`) and all `PATH`-pruning
+  assertions. Suite is 197 there, 200 on my branch, same 3 failing **by name**.
+  Cause not diagnosed; upstream CI is green, so they look local to this machine.
+  Not mine, and matching counts prove innocence and nothing about cause.
+- **`shiv:readme = "0.3"` is a real gate here**, unlike the 0.1.x repos: a
+  sentinel appended to `README.md` makes `--check` exit 1, and `readme build`
+  really rewrites the file. `readme build` moved only the tests badge, 197 → 200;
+  the floating `shiv:codebase = "0.4"` did not drift the `lints` badge at 19.
+
 ### General
 
+- **`gh repo clone <my-fork>` pre-creates an `upstream` remote**, so
+  `git remote add upstream` fails with "already exists" — that is the clone, not
+  a broken tree. Worse, `git switch -c <b> upstream/main` sets tracking to
+  `upstream/main`, and a bare `git push` there refuses with a message whose
+  suggested fix is `git push upstream HEAD:main` — the owner-only command. Run
+  `git branch --unset-upstream` and
+  `git remote set-url --push upstream DISABLED-no-agent-push` before committing.
+  Until `push -u origin` runs, `@{u}..HEAD` is measuring against upstream and
+  reads clean while nothing has reached my fork. In [[upstream-prs]].
+- **`git merge` in `~/Work/oikos` still dies `fatal: stash failed`** at git
+  2.55.0, on a clean fast-forwardable branch, and `git switch` prints it too
+  while succeeding — so an `&&` chain aborts after the switch has already
+  happened. The documented workaround in [[household-backlog]] works: `notes
+  obfuscate`, clear every `assume-unchanged`, `git merge --ff-only`, `notes
+  deobfuscate`, `notes suppress-refresh`. It buys a fast-forward, not a merge
+  commit.
+- **`shimmer as knack` does emit signing config** — `user.signingkey` with the
+  real fingerprint and `commit.gpgsign=true`, measured at installed
+  `shiv-shimmer/0.1.36`. The gap recorded in [[household-backlog]] is in
+  `mise run agent:env`, which emits none, and it bit knick because knick has no
+  `~/agents/knick/.gitconfig` equivalent. Do not repeat "shimmer as emits an
+  empty signingkey" — it is false for knack at this version. Check `%GK` against
+  `08D080CEE3860BA2` either way.
 - **Do not trust a green `readme build --check`.** Confirmed on two repos now
   (`sessions` 0.1.1, `threads` v0.1.0): the whole 0.1.x line no-ops and reports
   success. Prove the checker with a sentinel, regenerate with 0.3.4. In
@@ -66,7 +128,11 @@ https://github.com/KnickKnackLabs/threads/pull/26 on 2026-09-09.
 
 ## Next session
 
-- Take whatever knick ranks next. The queue's live copy is on
-  `knick/stale-refs`, not `main` — check there before reading `main`'s.
-- Three of my PRs are open and waiting (emails#47, sessions#146, threads#26).
-  Silence is not a signal; I do not nudge my own PRs.
+- Take whatever knick ranks next. [[work-queue]]'s pointer under `## Queue` now
+  says there is **no live assignment** — the five entries behind shimmer#816 all
+  stay `queued` and none becomes "next" by ordering. Do not self-promote one.
+- The `whoami` `sed`/`gh auth status` follow-up is unfiled on purpose. If knick
+  wants it, it is a fresh branch off `upstream/main`, never a stack on
+  `knack/whoami-unset-gh-token`.
+- Four of my PRs are open and waiting (emails#47, sessions#146, threads#26,
+  shimmer#816). Silence is not a signal; I do not nudge my own PRs.
